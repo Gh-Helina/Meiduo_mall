@@ -7,4 +7,6 @@ urlpatterns = [
     url(r'^hot/(?P<category_id>\d+)/$',views.HotGoodsView.as_view(),name='hot'),
     #详情页
     url(r'^detail/(?P<sku_id>\d+)/$',views.DetailView.as_view(),name='detail'),
+    #商品分类统计
+    url(r'^detail/visit/(?P<category_id>\d+)/$',views.VisitCountView.as_view(),name='detail/visit'),
 ]

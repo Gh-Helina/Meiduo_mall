@@ -27,11 +27,9 @@ class Content(BaseModel):
     text = models.TextField(null=True, blank=True, verbose_name='内容')
     sequence = models.IntegerField(verbose_name='排序')
     status = models.BooleanField(default=True, verbose_name='是否展示')
-
     class Meta:
         db_table = 'tb_content'
         verbose_name = '广告内容'
         verbose_name_plural = verbose_name
-
     def __str__(self):
         return self.category.name + ': ' + self.title

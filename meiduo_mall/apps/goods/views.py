@@ -4,7 +4,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views import View
 
-from apps.goods.models import SKU, GoodsCategory
+from apps.goods.models import SKU, GoodsCategory, GoodsVisitCount
 from apps.goods.utils import get_breadcrumb
 from utils.response_code import RETCODE
 
@@ -157,3 +157,84 @@ class DetailView(View):
         }
 
         return render(request,'detail.html',context)
+
+
+# class VisitCountView(View):
+#     def post(self, request,category_id):
+#         # 1.获取分类id
+#         try:
+#             category = GoodsCategory.objects.get(id=category_id)
+#         except GoodsCategory.DoesNotExist:
+#             return JsonResponse({'code':RETCODE.NODATAERR,'errmsg':' 没有此分类'})
+#
+#             # 2.获取今天日期
+#         from django.utils import timezone
+#         tody = timezone.localdate()
+#             # 3.增加访问量
+#             # 3.1
+#             # 根据分类id和日期查询数据库是否已经有今天的指定的分类记录，有加1，没有创建
+#         try:
+#             vc = GoodsVisitCount.object.get(category=category, date=tody)
+#         except GoodsVisitCount.DoesNotExist:
+#             # 不存在
+#             GoodsVisitCount.objects.create(
+#                 category=category,
+#                 date=tody,
+#                 count=1
+#             )
+#             return JsonResponse({'code':RETCODE.OK,'errmsg':'ok'})
+#         else:
+#             # 存在
+#             vc.count+=1
+#             vc.save()
+#
+#             return JsonResponse({'code ': RETCODE.OK, 'errmsg': 'ok'})
+
+"""
+1.功能分析
+    用户行为:    用户点击了某一个商品/某一个类别,应该+1
+    前端行为:       前端必须给我分类id
+    后端行为:    统计每一个商品分类在每一天中的访问量
+
+2. 分析后端实现的大体步骤
+        1.分类id
+        2.获取今天的日期
+        3.增加访问量
+
+3.确定请求方式和路由
+    GET
+    POST  detail/visit/cat_id/
+"""
+
+class VisitCountView(View):
+
+    def post(self,request,category_id):
+        # 1.分类id
+        try:
+            category=GoodsCategory.objects.get(id=category_id)
+        except GoodsCategory.DoesNotExist:
+            return JsonResponse({'code':RETCODE.NODATAERR,'errmsg':'没有此分类'})
+        # 2.获取今天的日期
+
+        from django.utils import timezone
+        today=timezone.localdate()
+        # 3.增加访问量
+        # 3.1 我们要根据 分类id和日期,查询数据库 是否已经有今天的指定的分类记录
+        try:
+            vc=GoodsVisitCount.objects.get(category=category,date=today)
+        except GoodsVisitCount.DoesNotExist:
+            #不存在
+            # 添加记录 count=1
+            GoodsVisitCount.objects.create(
+                category=category,
+                date=today,
+                count=1
+            )
+
+            return JsonResponse({'code':RETCODE.OK,'errmsg':'ok'})
+        else:
+            #存在,存在就将count+1
+            vc.count+=1
+            vc.save()
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok'})
+
