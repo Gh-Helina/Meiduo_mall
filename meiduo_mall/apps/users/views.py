@@ -591,6 +591,11 @@ class UserBrowseHistory(LoginRequiredMixin, View):
             return JsonResponse({'code': RETCODE.NODATAERR, 'errmsg': '没有此商品'})
         # 链接数据库
         redis_con = get_redis_connection('history')
+        # 1.
+        # 创建管道实例
+        pipeline = redis_con.pipeline()
+        # 2.
+        # 管道收集指令
         # 去重
         # redis_con.lrem(key,count,value)
         redis_con.lrem('history_%s' % user.id, 0, sku_id)
@@ -598,5 +603,14 @@ class UserBrowseHistory(LoginRequiredMixin, View):
         redis_con.lpush('history_%s' % user.id, sku_id)
         # 确保5条数据
         redis_con.ltrim('history_%s' % user.id, 0,4)
-
-        return JsonResponse({'code':RETCODE.OK,'errmsg':'ok'})
+        # 3.执行
+        pipeline.excute()
+        # 去重
+        # redis_con.lrem(key,count,value)
+        # redis_con.lrem('history_%s' % user.id, 0, sku_id)
+        # # 添加
+        # redis_con.lpush('history_%s' % user.id, sku_id)
+        # # 确保5条数据
+        # redis_con.ltrim('history_%s' % user.id, 0,4)
+        #
+        # return JsonResponse({'code':RETCODE.OK,'errmsg':'ok'})
