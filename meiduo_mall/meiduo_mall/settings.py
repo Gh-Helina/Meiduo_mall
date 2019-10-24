@@ -24,7 +24,7 @@ SECRET_KEY = 'eug-k6vq8xwerhws9%6q&*!06253+&3)*bjw15g^e1r3o_b34l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.meiduo.site', '127.0.0.1','192.168.36.69']
+ALLOWED_HOSTS = ['www.meiduo.site', '127.0.0.1', '192.168.36.69']
 
 # Application definition
 
@@ -132,6 +132,13 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
+     "history": { # 用户浏览记录
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/3",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "session"
@@ -222,8 +229,8 @@ AUTHENTICATION_BACKENDS = [
     # 'django.contrib.auth.backends.ModelBackend' #默认配置
     'utils.users.UsernameMobileModelBackend',
 ]
-#用户是否登录
-LOGIN_URL='/login/'
+# 用户是否登录
+LOGIN_URL = '/login/'
 
 ####QQ登录####
 QQ_CLIENT_ID = '101518219'
@@ -235,21 +242,13 @@ QQ_REDIRECT_URI = 'http://www.meiduo.site:8000/oauth_callback'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
-#发送邮件的邮箱
+# 发送邮件的邮箱
 EMAIL_HOST_USER = 'hln1369471@163.com'
-#在邮箱中设置的客户端授权密码
+# 在邮箱中设置的客户端授权密码
 EMAIL_HOST_PASSWORD = 'hln950329'
-#收件人看到的发件人
+# 收件人看到的发件人
 EMAIL_FROM = 'hln<hln1369471@163.com>'
-
-
-
-
-
-
-
-
 
 ###########自定义文件存储#####################
 # 指定自定义的Django文件存储类
-DEFAULT_FILE_STORAGE='utils.storage.MyStorage'
+DEFAULT_FILE_STORAGE = 'utils.storage.MyStorage'

@@ -26,6 +26,8 @@ urlpatterns = [
     url(r'^addresses/(?P<address_id>\d+)/title/$', views.DefaultAddressView.as_view(), name='addresses/title'),
     # 修改密码
     url(r'^password/$', views.ChangePasswordView.as_view(), name='password'),
+    #浏览记录
+    url(r'^browse_histories/$', views.UserBrowseHistory.as_view(), name='browse_histories/'),
     # 判断用户是否重复
     url(r'^usernames/(?P<username>[a-zA-Z0-9_-]{5,20})/$', views.UsernameCountView.as_view(), name='usernamecount'),
     url(r'^mobiles/(?P<mobile>1[3-9]\d{9})/$', views.MobilCountView.as_view(), name='mobilecount'),

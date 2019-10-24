@@ -10,7 +10,9 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.urls import reverse
 from django.views import View
+from django_redis import get_redis_connection
 
+from apps.goods.models import SKU
 from apps.users.models import User, Address
 from apps.users.utils import generic_active_email_url, check_active_token
 from utils.response_code import RETCODE
@@ -569,3 +571,32 @@ class ChangePasswordView(LoginRequiredMixin, View):
         response.delete_cookie('username')
 
         return response
+
+
+
+###########浏览记录###########
+class UserBrowseHistory(LoginRequiredMixin, View):
+    """用户浏览记录"""
+
+    def post(self, request):
+        # ①有用户信息(必须是登陆用户)
+        user = request.user
+        # ②获取商品id
+        data = json.loads(request.body.decode())
+        sku_id = data.get('sku_id')
+        # ③判断商品id(查询)
+        try:
+            sku = SKU.objects.get(id=sku_id)
+        except SKU.DoesNotExist:
+            return JsonResponse({'code': RETCODE.NODATAERR, 'errmsg': '没有此商品'})
+        # 链接数据库
+        redis_con = get_redis_connection('history')
+        # 去重
+        # redis_con.lrem(key,count,value)
+        redis_con.lrem('history_%s' % user.id, 0, sku_id)
+        # 添加
+        redis_con.lpush('history_%s' % user.id, sku_id)
+        # 确保5条数据
+        redis_con.ltrim('history_%s' % user.id, 0,4)
+
+        return JsonResponse({'code':RETCODE.OK,'errmsg':'ok'})
