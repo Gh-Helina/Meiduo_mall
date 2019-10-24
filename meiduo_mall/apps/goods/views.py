@@ -9,7 +9,7 @@ from apps.goods.models import SKU, GoodsCategory
 class ListView(View):
     """商品列表页"""
 
-    def get(self, request, category_id):
+    def get(self, request, category_id,page):
         """提供商品列表页"""
 
         try:
@@ -32,6 +32,12 @@ class ListView(View):
             order_filed='-price'
         data=SKU.objects.filter(category=category).order_by(order_filed)
         # 3.添加分页
-
+        from django.core.paginator import Paginator
+        # 3.1创建分页对象
+        paginator=Paginator(object_list=data,per_page=5)
+        # 3.2 获取指定页面数据
+        page_data=paginator.page(page)
+        total_page=paginator.num_pages
+        # 3.3获取总页数
         return render(request, 'list.html')
         # return
