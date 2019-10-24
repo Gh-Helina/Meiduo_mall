@@ -29,7 +29,7 @@ class IndexView(View):
             'categories': categories,
             'contents': contents,
         }
-        
+
         return render(request, 'index.html', context=context)
         # return render(request, 'index.html')
 

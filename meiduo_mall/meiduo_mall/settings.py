@@ -241,3 +241,15 @@ EMAIL_HOST_USER = 'hln1369471@163.com'
 EMAIL_HOST_PASSWORD = 'hln950329'
 #收件人看到的发件人
 EMAIL_FROM = 'hln<hln1369471@163.com>'
+
+
+
+
+
+
+
+
+
+###########自定义文件存储#####################
+# 指定自定义的Django文件存储类
+DEFAULT_FILE_STORAGE='utils.storage.MyStorage'
