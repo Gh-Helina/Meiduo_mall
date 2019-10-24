@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 
 # Create your views here.
@@ -5,6 +6,7 @@ from django.views import View
 
 from apps.goods.models import SKU, GoodsCategory
 from apps.goods.utils import get_breadcrumb
+from utils.response_code import RETCODE
 
 
 class ListView(View):
@@ -54,4 +56,34 @@ class ListView(View):
             'page_num': page,  # 当前页码
         }
         return render(request, 'list.html',context=context)
-        # return
+
+
+#################热销数据###################
+class HotGoodsView(View):
+    """商品热销排行"""
+
+    def get(self, request, category_id):
+        """提供商品热销排行JSON数据"""
+        # ​    1）获取分类id
+        # ​    2）判断分类id是否正确
+        try:
+            category=GoodsCategory.objects.get(id=category_id)
+        except GoodsCategory.DoesNotExist:
+            return JsonResponse({'code':RETCODE.NODATAERR,'errmsg':'无数据'})
+        # 根据销量倒序
+        # 3）根据分类id进行查询[SKU。。]
+        skus = SKU.objects.filter(category=category).order_by('-sales')[:2]
+        hotskus = []
+        # 4）将对象列表转换为字典
+        #
+        # ​    5）返回响应
+        for sku in skus:
+            hotskus.append({
+
+                'id': sku.id,
+                'default_image_url': sku.default_image.url,
+                'name': sku.name,
+                'price': sku.price
+
+            })
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok','hot_skus':hotskus})
