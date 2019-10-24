@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.views import View
 
 from apps.goods.models import SKU, GoodsCategory
+from apps.goods.utils import get_breadcrumb
 
 
 class ListView(View):
@@ -12,12 +13,16 @@ class ListView(View):
     def get(self, request, category_id,page):
         """提供商品列表页"""
 
+
         try:
             category=GoodsCategory.objects.get(id=category_id)
         except GoodsCategory.DoesNotExist:
             return render(request, '404.html')
         # 1.根据分类，查询所有数据
         data=SKU.objects.filter(category=category)
+        # 面包屑导航  将它抽取出去
+        breadcrumb=get_breadcrumb(category)
+
 
         # 2.添加排序
         # default:上架时间
@@ -39,5 +44,14 @@ class ListView(View):
         page_data=paginator.page(page)
         total_page=paginator.num_pages
         # 3.3获取总页数
-        return render(request, 'list.html')
+        context={
+
+            'breadcrumb': breadcrumb,  # 面包屑导航
+            'sort': sort,  # 排序字段
+            'category': category,  # 第三级分类
+            'page_skus': page_data,  # 分页后数据
+            'total_page': total_page,  # 总页数
+            'page_num': page,  # 当前页码
+        }
+        return render(request, 'list.html',context=context)
         # return
