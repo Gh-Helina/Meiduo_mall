@@ -327,6 +327,7 @@ class CartsView(View):
             #     set     [sku_id,sku_id]
             # [sku_id,sku_id]
             # [1]
+            # 获取所有选中的成员
             selected_ids = redis_conn.smembers('selected_%s' % user.id)
             # 将redis数据转换为cookie格式
             #   cookie_str = {sku_id:{count:5,selected:True}}
@@ -379,6 +380,103 @@ class CartsView(View):
             })
             # 7 返回响应
         return render(request, 'cart.html', context={'cart_skus': carts_list})
+
+    def put(self, request):
+        """
+            1.功能分析
+                用户行为:       用户可能会点击某一个商品的数量/选中状态
+                前端行为:       前端需要收集 点击的 sku_id,count,selected 以及用户信息
+                后端行为:       实现更新
+
+            2. 分析后端实现的大体步骤
+                    1.接收数据
+                    2.验证数据
+                    3.获取用户信息
+                    4.登陆用户更新redis
+                        4.1 连接redis
+                        4.2 更新数据
+                        4.3 返回相应
+                    5.未登录用户更新cookie
+                        5.1 获取cookie中的数据,并进行判断
+                            如果有数据则需要进行解码
+                        5.2 更新数据  cart={}
+                        5.3 将字典进行编码
+                        5.4 设置cookie
+                        5.5 返回相应
+
+            3.确定请求方式和路由
+            """
+        # 1.接收收据
+        json_data = json.loads(request.body.decode())
+        sku_id = json_data.get('sku_id')
+        count = json_data.get('count')
+        selected = json_data.get('selected')
+        # 2.验证数据
+        try:
+            sku = SKU.objects.get(id=sku_id)
+        except SKU.DoesNotExist:
+            return JsonResponse({'code': RETCODE.NODATAERR, 'errmsg': '没有此信息'})
+            # 3.获取用户信息
+        user = request.user
+        if user.is_authenticated:
+
+            # 4.登陆用户更新redis
+            #     4.1 连接redis
+            redis_con=get_redis_connection('carts')
+            #     4.2 更新数据
+            # hash
+            redis_con.hset('carts_%s'%user.id,sku_id,count)
+            # set
+            if selected:
+                redis_con.sadd('selected_%s'%user.id,sku_id)
+            else:
+                redis_con.srem('selected_%s'%user.id,sku_id)
+                #     4.3 返回相应
+                data = {
+                    'count': count,
+                    'id': sku_id,
+                    'selected': selected,
+                    'name': sku.name,
+                    'default_image_url': sku.default_image.url,
+                    'price': sku.price,
+                    'amount': sku.price * count,
+                }
+                return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok', 'cart_sku': data})
+        else:
+
+            # 5.未登录用户更新cookie
+            #     5.1 获取cookie中的数据,并进行判断
+            cookie_str=request.COOKIES.get('carts')
+            if cookie_str is not None:
+                cookie_dict=pickle.loads(base64.b64decode(cookie_str))
+            else:
+                cookie_dict={}
+                #     5.2 更新数据  cart={}
+                # sku_id 是否在字典列表中
+                # carts = {sku_id:{count:5,selected:True}}
+            if sku_id in cookie_dict:
+                cookie_dict[sku_id]={
+                    'count': count,
+                    'selected': selected
+                }
+                #     5.3 将字典进行编码
+                cookie_data = base64.b64encode(pickle.dumps(cookie_dict))
+                #     5.4 设置cookie
+                data={
+                    'count': count,
+                    'id': sku_id,
+                    'selected': selected,
+                    'name': sku.name,
+                    'default_image_url': sku.default_image.url,
+                    'price': sku.price,
+                    'amount': sku.price * count,
+                }
+                response=JsonResponse({'code':RETCODE.OK,'errmsg':'ok','cart_sku':data})
+                response.set_cookie('carts',cookie_data,max_age=7*24*3600)
+
+                # 5.5 返回相应
+
+                return response
 
 ######################以下代码为编码################################
 
