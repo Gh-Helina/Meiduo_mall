@@ -41,6 +41,8 @@ urlpatterns = [
     url(r'^',include(('apps.oauth.urls','apps.oauth'),namespace='oauth')),
     #省市区
     url(r'^',include(('apps.areas.urls','apps.areas'),namespace='areas')),
+    #购物车
+    url(r'^',include(('apps.carts.urls','apps.carts'),namespace='carts')),
 
     url(r'^',include(('apps.goods.urls','apps.goods'),namespace='goods')),
 ]
