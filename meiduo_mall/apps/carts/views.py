@@ -478,6 +478,86 @@ class CartsView(View):
 
                 return response
 
+            """
+                1.功能分析
+                    用户行为:
+                    前端行为:
+                    后端行为:
+
+                2. 分析后端实现的大体步骤
+                        1.接收数据
+                        2.验证数据
+                        3.获取用户信息,并进行判断
+                        4.登陆则操作redis
+                            4.1 连接redis
+                            4.2 hash
+                                set
+                            4.3 返回相应
+                        5.未登录则操作cookie
+                            5.1 先获取cookie数据,并进行判断
+                                如果有数据,则进行解码
+                            5.2 删除数据  {}
+                            5.3 对数据进行编码
+                            5.4 设置cookie数据
+                            5.5 返回相应
+
+                3.确定请求方式和路由
+                """
+    def delete(self,request):
+
+
+        # 1.接收数据
+        json_data=json.loads(request.body.decode())
+        sku_id=json_data.get('sku_id')
+        # 2.验证数据
+        try:
+            # sku=SKU.objects.get(id=sku_id)
+            # pk primary key 主键
+            sku=SKU.objects.get(pk=sku_id)
+        except SKU.DoesNotExist:
+            return JsonResponse({'code':RETCODE.NODATAERR,'errmsg':'没有此数据'})
+
+        # 3.获取用户信息,并进行判断
+        user=request.user
+        if user.is_authenticated:
+        # 4.登陆则操作redis
+        #     4.1 连接redis
+            redis_con = get_redis_connection('carts')
+        #     4.2 hash
+            redis_con.hdel('carts_%s'%user.id,sku_id)
+                # set
+            redis_con.srem('selected_%s'%user.id,sku_id)
+        #     4.3 返回响应
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok'})
+
+        # 5.未登录则操作cookie
+        else:
+        #     5.1 先获取cookie数据,并进行判断
+            cookie_str=request.COOKIES.get('carts')
+        #         如果有数据,则进行解码
+            if cookie_str is not None:
+                cookie_dict=pickle.loads(base64.b64decode(cookie_str))
+            else:
+                cookie_dict={}
+
+        #     5.2 删除数据  {}
+            if sku_id in cookie_dict:
+                del cookie_dict[sku_id]
+        #     5.3 对数据进行编码
+            cookie_data=base64.b64encode(pickle.dumps(cookie_dict))
+        #     5.4 设置cookie数据
+            response = JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok'})
+            response.set_cookie('carts', cookie_data, max_age=7 * 24 * 3600)
+            #     5.5 返回相应
+            return response
+
+
+
+
+
+
+
+
 ######################以下代码为编码################################
 
 # import pickle
