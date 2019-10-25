@@ -169,17 +169,17 @@ class LogoutView(View):
         #
         return response
 
-    ###########判断是否登录############
-    # class UserCenterInfoView(View):
-    #     def get(self,request):
-    #       request.user 请求中 有用户的信息
-    # is_authenticated 判断用户是否为登陆用户
-    # 登陆用户为True
-    # 未登陆用户为False
-    # if request.user.is_authenticated:
-    #     return render(request,'user_center_info.html')
-    # else:
-    #     return redirect(reverse('users:login'))
+        ###########判断是否登录############
+        # class UserCenterInfoView(View):
+        #     def get(self,request):
+        #       request.user 请求中 有用户的信息
+        # is_authenticated 判断用户是否为登陆用户
+        # 登陆用户为True
+        # 未登陆用户为False
+        # if request.user.is_authenticated:
+        #     return render(request,'user_center_info.html')
+        # else:
+        #     return redirect(reverse('users:login'))
 
 
 # return render(request,'user_center_info.html')
@@ -243,18 +243,19 @@ class EmailView(LoginRequiredMixin, View):
         #
         # send_mail(subject=subject, message=message, from_email=from_email, recipient_list=recipient_list, html_message=html_mesage)
 
-        #任务名.delay 添加到中间人
+        # 任务名.delay 添加到中间人
         from celery_tasks.email.tasks import send_active_email
-        send_active_email.delay(request.user.id,email)
+        send_active_email.delay(request.user.id, email)
 
         # 5.返回响应
         return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok'})
 
+
 ###########激活邮件####################
 class EmailActiveView(View):
-    def get(self,request):
+    def get(self, request):
         # 1.获取token
-        token=request.GET.get('token')
+        token = request.GET.get('token')
         if token is None:
             return HttpResponseBadRequest('缺少参数')
         # 2.token信息解密
@@ -262,24 +263,25 @@ class EmailActiveView(View):
         if data is None:
             return HttpResponseBadRequest('验证失败')
         # 3.根据用户信息进行数据更新
-        id=data.get('id')
+        id = data.get('id')
         email = data.get('email')
         # 4.查询用户
         try:
-            user=User.objects.get(id=id,email=email)
+            user = User.objects.get(id=id, email=email)
         except User.DoesNotExist:
             return HttpResponseBadRequest('验证失败')
-        #设置邮件激活状态
-        user.email_active=True
+        # 设置邮件激活状态
+        user.email_active = True
         user.save()
         # 5.跳转到个人中心页面
         return redirect(reverse('users:center'))
         # return HttpResponse('激活成功')
 
+
 ############省市区渲染###############
 class UserCentSiteView(View):
-    def get(self,request):
-        return render(request,'user_center_site.html')
+    def get(self, request):
+        return render(request, 'user_center_site.html')
 
 
 ##############增加用户地址#######################
@@ -321,15 +323,15 @@ class CreateAddressView(LoginRequiredMixin, View):
         try:
             address = Address.objects.create(
                 user=request.user,
-                title = receiver,
-                receiver = receiver,
-                province_id = province_id,
-                city_id = city_id,
-                district_id = district_id,
-                place = place,
-                mobile = mobile,
-                tel = tel,
-                email = email
+                title=receiver,
+                receiver=receiver,
+                province_id=province_id,
+                city_id=city_id,
+                district_id=district_id,
+                place=place,
+                mobile=mobile,
+                tel=tel,
+                email=email
             )
 
             # 设置默认地址
@@ -355,9 +357,7 @@ class CreateAddressView(LoginRequiredMixin, View):
         }
 
         # 响应保存结果
-        return JsonResponse({'code': RETCODE.OK, 'errmsg': '新增地址成功', 'address':address_dict})
-
-
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': '新增地址成功', 'address': address_dict})
 
 
 ##############显示用户地址#######################
@@ -377,11 +377,11 @@ class AddressView(LoginRequiredMixin, View):
                 "title": address.title,
                 "receiver": address.receiver,
                 "province": address.province.name,
-                "province_id":address.province_id,
+                "province_id": address.province_id,
                 "city": address.city.name,
-                "city_id":address.city_id,
+                "city_id": address.city_id,
                 "district": address.district.name,
-                "district_id":address.district_id,
+                "district_id": address.district_id,
                 "place": address.place,
                 "mobile": address.mobile,
                 "tel": address.tel,
@@ -395,8 +395,6 @@ class AddressView(LoginRequiredMixin, View):
         }
 
         return render(request, 'user_center_site.html', context)
-
-
 
 
 ##################修改地址#####################
@@ -431,16 +429,16 @@ class UpdateDestroyAddressView(LoginRequiredMixin, View):
         # 判断地址是否存在,并更新地址信息
         try:
             Address.objects.filter(id=address_id).update(
-                user = request.user,
-                title = receiver,
-                receiver = receiver,
-                province_id = province_id,
-                city_id = city_id,
-                district_id = district_id,
-                place = place,
-                mobile = mobile,
-                tel = tel,
-                email = email
+                user=request.user,
+                title=receiver,
+                receiver=receiver,
+                province_id=province_id,
+                city_id=city_id,
+                district_id=district_id,
+                place=place,
+                mobile=mobile,
+                tel=tel,
+                email=email
             )
         except Exception as e:
             logger.error(e)
@@ -480,7 +478,6 @@ class UpdateDestroyAddressView(LoginRequiredMixin, View):
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '删除地址成功'})
 
 
-
 ################设置默认地址地址#########################
 
 
@@ -502,8 +499,6 @@ class DefaultAddressView(LoginRequiredMixin, View):
 
         # 响应设置默认地址结果
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '设置默认地址成功'})
-
-
 
 
 ####################修改地址标题#############################
@@ -555,7 +550,7 @@ class ChangePasswordView(LoginRequiredMixin, View):
 
         # 3.检验旧密码是否正确
         if not request.user.check_password(old_password):
-            return render(request, 'user_center_pass.html', {'origin_password_errmsg':'原始密码错误'})
+            return render(request, 'user_center_pass.html', {'origin_password_errmsg': '原始密码错误'})
         # 4.更新新密码
         try:
             request.user.set_password(new_password)
@@ -571,7 +566,6 @@ class ChangePasswordView(LoginRequiredMixin, View):
         response.delete_cookie('username')
 
         return response
-
 
 
 ###########浏览记录###########
@@ -598,13 +592,15 @@ class UserBrowseHistory(LoginRequiredMixin, View):
         # 管道收集指令
         # 去重
         # redis_con.lrem(key,count,value)
-        redis_con.lrem('history_%s' % user.id, 0, sku_id)
-        # 添加
-        redis_con.lpush('history_%s' % user.id, sku_id)
-        # 确保5条数据
-        redis_con.ltrim('history_%s' % user.id, 0,4)
-        # 3.执行
-        pipeline.excute()
+        pipeline.lrem('history_%s' % user.id, 0, sku_id)
+        # 4.2 再添加
+        pipeline.lpush('history_%s' % user.id, sku_id)
+        # 4.3 确保有5条记录
+        pipeline.ltrim('history_%s' % user.id, 0, 4)
+        # 三,执行 !!!! 一定要记得执行
+        pipeline.execute()
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok'})
+
         # 去重
         # redis_con.lrem(key,count,value)
         # redis_con.lrem('history_%s' % user.id, 0, sku_id)
@@ -614,3 +610,26 @@ class UserBrowseHistory(LoginRequiredMixin, View):
         # redis_con.ltrim('history_%s' % user.id, 0,4)
         #
         # return JsonResponse({'code':RETCODE.OK,'errmsg':'ok'})
+
+    def get(self, request):
+
+        # ①获取用户信息
+        user = request.user
+        # ②获取redis数据 [16,10,1]
+        redis_conn = get_redis_connection('history')
+        ids = redis_conn.lrange('history_%s' % user.id, 0, 4)
+
+        history_list = []
+        for id in ids:
+            # ③ 根据id查询商品详细信息 SKU
+            sku = SKU.objects.get(id=id)
+            # ④ 将对象转换为字典
+            history_list.append({
+                'id': sku.id,
+                'name': sku.name,
+                'default_image_url': sku.default_image.url,
+                'price': sku.price
+            })
+        # ⑤ 返回数据
+        # skus在js里 this.histories = response.data.skus;
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok', 'skus': history_list})
