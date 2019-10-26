@@ -180,6 +180,8 @@ from billiard.common import pickle
 #             #     5.4 返回相应
 #             return response
 import json
+
+from django.http import HttpResponseBadRequest
 from django.http import JsonResponse
 # Create your views here.
 from django.shortcuts import render
@@ -346,6 +348,7 @@ class CartsView(View):
                 # else:
                 #     selected=False
                 # sku_id in selected_ids如果商品id在选中的列表中那么就是选中的
+                # redis数据是bytes类型,所以要转换数据类型
                 cookie_dict[int(sku_id)] = {
                     'count': int(count),
                     'selected': sku_id in selected_ids
@@ -557,6 +560,44 @@ class CartsView(View):
             response = JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok'})
             response.set_cookie('carts', cookie_data, max_age=7 * 24 * 3600)
             #     5.5 返回相应
+            return response
+
+
+###############全选####################
+class CartsSelectAllView(View):
+    """全选购物车"""
+
+    def put(self, request):
+        # 接收和校验参数
+        data=json.loads(request.body.decode())
+        selected=data.get('selected')
+        if selected:
+            if not isinstance(selected,bool):
+                return HttpResponseBadRequest('参数selected有误')
+        # 判断用户是否登录
+        user = request.user
+        # 用户已登录，操作redis购物车
+        if user.is_authenticated:
+            redis_con=get_redis_connection('carts')
+            cart=redis_con.hgetall('carts_%s' % user.id)
+            sku_id_list=cart.keys()
+            #全选
+            if selected:
+                redis_con.sadd('selected_%s' % user.id, *sku_id_list)
+            else:
+                # 取消全选
+                redis_con.srem('selected_%s' % user.id, *sku_id_list)
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '全选购物车成功'})
+        else:
+            # 用户未登录，操作cookie购物车
+            cart=request.COOKIES.get('carts')
+            response=JsonResponse({'code': RETCODE.OK, 'errmsg': '全选购物车成功'})
+            if cart is not None:
+                cart=pickle.loads(base64.b64decode(cart.encode()))
+                for sku_id in cart:
+                    cart[sku_id]['selected']=selected
+                cookie_cart=base64.b64encode(pickle.dump(cart)).decode()
+                response.set_cookie('carts',cookie_cart,max_age=24*3600)
             return response
 
 ######################以下代码为编码################################
