@@ -28,19 +28,17 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/apps/carts/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="227">
-              <caret line="252" column="23" lean-forward="false" selection-start-line="252" selection-start-column="23" selection-end-line="252" selection-end-column="23" />
+            <state relative-caret-position="194">
+              <caret line="340" column="18" lean-forward="false" selection-start-line="340" selection-start-column="18" selection-end-line="340" selection-end-column="18" />
               <folding>
                 <element signature="e#1754#1767#0" expanded="true" />
                 <element signature="e#1804#1828#0" expanded="false" />
                 <element signature="e#4900#5348#1" expanded="false" />
-                <element signature="e#9391#9419#0" expanded="false" />
-                <element signature="e#9764#9789#0" expanded="false" />
-                <element signature="e#10259#10301#0" expanded="false" />
-                <element signature="e#11373#15572#0" expanded="false" />
-                <element signature="e#11373#12105#1" expanded="false" />
-                <element signature="e#14805#15572#1" expanded="false" />
-                <marker date="1572091865289" expanded="false" signature="8601:11335" ph="..." />
+                <element signature="e#9496#9524#0" expanded="false" />
+                <element signature="e#9869#9894#0" expanded="false" />
+                <element signature="e#10364#10406#0" expanded="false" />
+                <element signature="e#11478#12210#1" expanded="false" />
+                <element signature="e#14910#15677#1" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -692,11 +690,6 @@
           <line>40</line>
           <option name="timeStamp" value="86" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/apps/carts/views.py</url>
-          <line>414</line>
-          <option name="timeStamp" value="111" />
-        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -1110,19 +1103,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/carts/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="227">
-          <caret line="252" column="23" lean-forward="false" selection-start-line="252" selection-start-column="23" selection-end-line="252" selection-end-column="23" />
+        <state relative-caret-position="194">
+          <caret line="340" column="18" lean-forward="false" selection-start-line="340" selection-start-column="18" selection-end-line="340" selection-end-column="18" />
           <folding>
             <element signature="e#1754#1767#0" expanded="true" />
             <element signature="e#1804#1828#0" expanded="false" />
             <element signature="e#4900#5348#1" expanded="false" />
-            <element signature="e#9391#9419#0" expanded="false" />
-            <element signature="e#9764#9789#0" expanded="false" />
-            <element signature="e#10259#10301#0" expanded="false" />
-            <element signature="e#11373#15572#0" expanded="false" />
-            <element signature="e#11373#12105#1" expanded="false" />
-            <element signature="e#14805#15572#1" expanded="false" />
-            <marker date="1572091865289" expanded="false" signature="8601:11335" ph="..." />
+            <element signature="e#9496#9524#0" expanded="false" />
+            <element signature="e#9869#9894#0" expanded="false" />
+            <element signature="e#10364#10406#0" expanded="false" />
+            <element signature="e#11478#12210#1" expanded="false" />
+            <element signature="e#14910#15677#1" expanded="false" />
           </folding>
         </state>
       </provider>

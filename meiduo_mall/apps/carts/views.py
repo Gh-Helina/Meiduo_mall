@@ -250,14 +250,17 @@ class CartsView(View):
             #               field:value
             #               field:value
 
-            # 累加hincrby
+            # 累加hincrby 数量
             # redis_conn.hset('carts_%s' % user.id, sku_id, count)
-            redis_conn.hincrby('carts_%s' % user.id, sku_id, count)
-
+            # 创建管道实例
+            pl=redis_conn.pipeline()
+            pl.hincrby('carts_%s' % user.id, sku_id, count)
+            # 收集数据
             # set
-
-            redis_conn.sadd('selected_%s' % user.id, sku_id)
+            pl.sadd('selected_%s' % user.id, sku_id)
             #     4.3 返回相应
+            #执行管道
+            pl.execute()
             return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok'})
 
         else:
