@@ -30,7 +30,7 @@ class IndexView(View):
             'contents': contents,
         }
 
-        return render(request, 'index.html', context=context)
+        return render(request, 'index.html', context)
         # return render(request, 'index.html')
 
 
