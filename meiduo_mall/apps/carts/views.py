@@ -188,6 +188,7 @@ from django.shortcuts import render
 from django.views import View
 from django_redis import get_redis_connection
 
+from apps.carts.utils import merge_cart_cookie_to_redis
 from apps.goods.models import SKU
 from utils.response_code import RETCODE
 
@@ -219,6 +220,7 @@ class CartsView(View):
         POST        carts
     """
 
+    # 添加购物车 #
     def post(self, request):
 
         # 1.接收数据,判断商品信息
@@ -255,13 +257,13 @@ class CartsView(View):
             # 累加hincrby 数量
             # redis_conn.hset('carts_%s' % user.id, sku_id, count)
             # 创建管道实例
-            pl=redis_conn.pipeline()
+            pl = redis_conn.pipeline()
             pl.hincrby('carts_%s' % user.id, sku_id, count)
             # 收集数据
             # set
             pl.sadd('selected_%s' % user.id, sku_id)
             #     4.3 返回相应
-            #执行管道
+            # 执行管道
             pl.execute()
             return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok'})
 
@@ -287,7 +289,7 @@ class CartsView(View):
                 # 1
                 if sku_id in cookie_data:
 
-                    # 累加数量
+                    # 累加数量[1]['16']
                     origin_count = cookie_data[sku_id]['count']
                     # count=origin_count+count
                     count += origin_count
@@ -321,6 +323,8 @@ class CartsView(View):
 
             #############展示购物车信息################
 
+        # 显示购物车 #
+    # 显示购物车 #
     def get(self, request):
         # 1.先获取用户
         user = request.user
@@ -392,6 +396,7 @@ class CartsView(View):
             # 7 返回响应
         return render(request, 'cart.html', context={'cart_skus': carts_list})
 
+    # 修改购物车 #
     def put(self, request):
         """
             1.功能分析
@@ -514,6 +519,7 @@ class CartsView(View):
 
                 3.确定请求方式和路由
                 """
+        # 删除购物车 #
 
     def delete(self, request):
 
@@ -569,19 +575,19 @@ class CartsSelectAllView(View):
 
     def put(self, request):
         # 接收和校验参数
-        data=json.loads(request.body.decode())
-        selected=data.get('selected')
+        data = json.loads(request.body.decode())
+        selected = data.get('selected')
         if selected:
-            if not isinstance(selected,bool):
+            if not isinstance(selected, bool):
                 return HttpResponseBadRequest('参数selected有误')
         # 判断用户是否登录
         user = request.user
         # 用户已登录，操作redis购物车
         if user.is_authenticated:
-            redis_con=get_redis_connection('carts')
-            cart=redis_con.hgetall('carts_%s' % user.id)
-            sku_id_list=cart.keys()
-            #全选
+            redis_con = get_redis_connection('carts')
+            cart = redis_con.hgetall('carts_%s' % user.id)
+            sku_id_list = cart.keys()
+            # 全选
             if selected:
                 redis_con.sadd('selected_%s' % user.id, *sku_id_list)
             else:
@@ -590,17 +596,15 @@ class CartsSelectAllView(View):
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '全选购物车成功'})
         else:
             # 用户未登录，操作cookie购物车
-            cart=request.COOKIES.get('carts')
-            response=JsonResponse({'code': RETCODE.OK, 'errmsg': '全选购物车成功'})
+            cart = request.COOKIES.get('carts')
+            response = JsonResponse({'code': RETCODE.OK, 'errmsg': '全选购物车成功'})
             if cart is not None:
-                cart=pickle.loads(base64.b64decode(cart.encode()))
+                cart = pickle.loads(base64.b64decode(cart.encode()))
                 for sku_id in cart:
-                    cart[sku_id]['selected']=selected
-                cookie_cart=base64.b64encode(pickle.dump(cart)).decode()
-                response.set_cookie('carts',cookie_cart,max_age=24*3600)
+                    cart[sku_id]['selected'] = selected
+                cookie_cart = base64.b64encode(pickle.dump(cart)).decode()
+                response.set_cookie('carts', cookie_cart, max_age=24 * 3600)
             return response
-
-
 
 
 ##########展示商品页面简单购物车##################
@@ -612,37 +616,42 @@ class CartsSimpleView(View):
         user = request.user
         if user.is_authenticated:
             # 用户已登录，查询Redis购物车
-            redis_con=get_redis_connection('carts')
-            redis_cart=redis_con.hgetall('carts_%s' % user.id)
-            redis_selected=redis_con.smembers('selected_%s' % user.id)
+            redis_con = get_redis_connection('carts')
+            redis_cart = redis_con.hgetall('carts_%s' % user.id)
+            redis_selected = redis_con.smembers('selected_%s' % user.id)
             # 将redis中的两个数据统一格式，跟cookie中的格式一致，方便统一查询
-            cart_dict={}
-            for sku_id,count in redis_cart.items():
-                cart_dict[int(sku_id)]={
+            cart_dict = {}
+            for sku_id, count in redis_cart.items():
+                cart_dict[int(sku_id)] = {
                     'count': int(count),
                     'selected': sku_id in redis_selected
                 }
         else:
             # 用户未登录，查询cookie购物车
-            cart_str=request.COOKIES.get('carts')
+            cart_str = request.COOKIES.get('carts')
             if cart_str:
-                cart_dict=pickle.loads(base64.b64decode(cart_str.encode()))
+                cart_dict = pickle.loads(base64.b64decode(cart_str.encode()))
             else:
-                cart_dict={}
+                cart_dict = {}
 
         # 构造简单购物车JSON数据
-        cart_skus=[]
-        sku_ids=cart_dict.keys()
-        skus=SKU.objects.filter(id__in=sku_ids)
+        cart_list = []
+        sku_ids = cart_dict.keys()
+        skus = SKU.objects.filter(id_in=sku_ids)
         for sku in skus:
-            cart_skus.append({
+            cart_list.append({
                 'id': sku.id,
                 'name': sku.name,
                 'count': cart_dict.get(sku.id).get('count'),
                 'default_image_url': sku.default_image.url
             })
-        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'cart_skus': cart_skus})
-######################以下代码为编码################################
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'cart_skus': cart_list})
+
+        # 合并购物车
+
+        # response = merge_cart_cookie_to_redis(request=request, user=user, response=response)
+
+######################编码################################
 
 # import pickle
 # import base64

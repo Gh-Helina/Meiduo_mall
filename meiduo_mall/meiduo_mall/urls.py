@@ -45,4 +45,6 @@ urlpatterns = [
     url(r'^',include(('apps.carts.urls','apps.carts'),namespace='carts')),
 
     url(r'^',include(('apps.goods.urls','apps.goods'),namespace='goods')),
+    #支付
+    url(r'^',include(('apps.orders.urls','apps.orders'),namespace='orders')),
 ]

@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
+from apps.carts.utils import merge_cart_cookie_to_redis
 from apps.oauth.models import OAuthQQUser
 from apps.oauth.utils import serect_openid, check_openid
 
@@ -47,6 +48,8 @@ class QQLoginView(View):
             # 设置cookie
             response.set_cookie('username', qquser.user.username, max_age=24 * 3600)
 
+            # 合并购物车
+            # response = merge_cart_cookie_to_redis(request, user, response)
             return response
 
     def post(self, request):
@@ -120,5 +123,6 @@ class QQLoginView(View):
         response = redirect(reverse('contents:index'))
 
         response.set_cookie('username', user.username, max_age=24 * 3600)
+
 
         return response

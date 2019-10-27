@@ -232,6 +232,7 @@ var vm = new Vue({
                         })
                         .catch(error => {
                             console.log(error.response);
+                            //"Cannot read property 'code' of null"
                         });
                 } else {
                     // 修改地址
