@@ -15,7 +15,7 @@ urlpatterns = [
     #发送验证
     url(r'^emailsactive/$', views.EmailActiveView.as_view(), name='emailsactive'),
     #省市区
-    url(r'^site/$', views.UserCentSiteView.as_view(), name='site'),
+    url(r'^site/$', views.UserCentSiteView.as_view(), name='address'),
     # 新增地址
     url(r'^addresses/create/$', views.CreateAddressView.as_view(), name='addresses/create'),
     # 修改地址
