@@ -24,7 +24,7 @@ SECRET_KEY = 'eug-k6vq8xwerhws9%6q&*!06253+&3)*bjw15g^e1r3o_b34l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.meiduo.site', '127.0.0.1', '192.168.36.69']
+ALLOWED_HOSTS = ['www.meiduo.site', '127.0.0.1', '192.168.221.135']
 
 # Application definition
 
@@ -51,7 +51,8 @@ CRONJOBS = [
     # 参数2:定时任务就是函数  apps/contents/crons
     #
     (
-    '*/1 * * * *', 'apps.contents.crons.generate_static_index_html', '>> ' + os.path.join(BASE_DIR, 'logs/crontab.log'))
+        '*/1 * * * *', 'apps.contents.crons.generate_static_index_html',
+        '>> ' + os.path.join(BASE_DIR, 'logs/crontab.log'))
 ]
 
 MIDDLEWARE = [
@@ -111,7 +112,7 @@ WSGI_APPLICATION = 'meiduo_mall.wsgi.application'
 #     }
 # }
 DATABASES = {
-    'default': {
+    'default': {#主
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
         'HOST': '127.0.0.1',  # 数据库主机
         'PORT': 3306,  # 数据库端口
@@ -119,7 +120,17 @@ DATABASES = {
         'PASSWORD': 'mysql',  # 数据库用户密码
         'NAME': 'meiduo_mall'  # 数据库名字
     },
+    'slave': { #从服务器
+        'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
+        'HOST': '127.0.0.1',  # 数据库主机
+        'PORT': 8306,  # 数据库端口
+        'USER': 'root',  # 数据库用户名
+        'PASSWORD': 'mysql',  # 数据库用户密码
+        'NAME': 'meiduo_mall'  # 数据库名字
+    },
 }
+# 2.配置数据库读写路由
+DATABASE_ROUTERS = ['utils.db_router.MasterSlaveDBRouter']
 
 ############redis#################
 CACHES = {
