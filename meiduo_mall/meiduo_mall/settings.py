@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.areas',
     'apps.goods',
     'apps.orders',
+    'apps.payment',
 ]
 
 MIDDLEWARE = [
@@ -260,3 +261,13 @@ EMAIL_FROM = 'hln<hln1369471@163.com>'
 ###########自定义文件存储#####################
 # 指定自定义的Django文件存储类
 DEFAULT_FILE_STORAGE = 'utils.storage.MyStorage'
+
+
+##############AliPay#################################
+
+ALIPAY_APPID = '2016091600523030'
+ALIPAY_DEBUG = True
+ALIPAY_URL = 'https://openapi.alipaydev.com/gateway.do'
+ALIPAY_RETURN_URL = 'http://www.meiduo.site:8000/payment/status/'
+APP_PRIVATE_KEY_PATH = os.path.join(BASE_DIR, 'apps/payment/keys/app_private_key.pem')
+ALIPAY_PUBLIC_KEY_PATH = os.path.join(BASE_DIR, 'apps/payment/keys/alipay_public_key.pem')
