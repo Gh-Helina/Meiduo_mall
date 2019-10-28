@@ -103,3 +103,8 @@ class PaymentStatusView(View):
         # 获取前端传入的请求参数
 
 #我的订单##
+
+##########我的订单###############
+# class Mypayment(View):
+#     def get(self,request):
+#         render(request,'user_center_order.html')

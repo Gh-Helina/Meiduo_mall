@@ -42,6 +42,16 @@ INSTALLED_APPS = [
     'apps.goods',
     'apps.orders',
     'apps.payment',
+    'django_crontab',
+]
+CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
+CRONJOBS = [
+    # 每1分钟生成一次首页静态文件
+    # 参数1:定时任务的频次
+    # 参数2:定时任务就是函数  apps/contents/crons
+    #
+    (
+    '*/1 * * * *', 'apps.contents.crons.generate_static_index_html', '>> ' + os.path.join(BASE_DIR, 'logs/crontab.log'))
 ]
 
 MIDDLEWARE = [
@@ -134,7 +144,7 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
-     "history": { # 用户浏览记录
+    "history": {  # 用户浏览记录
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/3",
         "OPTIONS": {
@@ -261,7 +271,6 @@ EMAIL_FROM = 'hln<hln1369471@163.com>'
 ###########自定义文件存储#####################
 # 指定自定义的Django文件存储类
 DEFAULT_FILE_STORAGE = 'utils.storage.MyStorage'
-
 
 ##############AliPay#################################
 
