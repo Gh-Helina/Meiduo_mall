@@ -2,13 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e729dded-6895-4720-a1f2-d1359692c3ea" name="默认的" comment="用户绑定前端修改">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/apps/payment/keys/alipay_public_key.pem" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/apps/payment/keys/app_private_key.pem" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/apps/payment/urls.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/static/pay_success.html" afterPath="$PROJECT_DIR$/templates/pay_success.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/static/user_center_order.html" afterPath="$PROJECT_DIR$/templates/user_center_order.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/meiduo_mall/settings.py" afterPath="$PROJECT_DIR$/meiduo_mall/settings.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/meiduo_mall/urls.py" afterPath="$PROJECT_DIR$/meiduo_mall/urls.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/payment/models.py" afterPath="$PROJECT_DIR$/apps/payment/models.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/payment/urls.py" afterPath="$PROJECT_DIR$/apps/payment/urls.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/payment/views.py" afterPath="$PROJECT_DIR$/apps/payment/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/goods_judge.html" afterPath="$PROJECT_DIR$/static/goods_judge.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/cart.html" afterPath="$PROJECT_DIR$/templates/cart.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/index.html" afterPath="$PROJECT_DIR$/templates/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/order_success.html" afterPath="$PROJECT_DIR$/templates/order_success.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/pay_success.html" afterPath="$PROJECT_DIR$/templates/pay_success.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/place_order.html" afterPath="$PROJECT_DIR$/templates/place_order.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/user_center_info.html" afterPath="$PROJECT_DIR$/templates/user_center_info.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/user_center_pass.html" afterPath="$PROJECT_DIR$/templates/user_center_pass.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/user_center_site.html" afterPath="$PROJECT_DIR$/templates/user_center_site.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -34,20 +41,22 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/apps/payment/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="118">
-              <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+            <state relative-caret-position="199">
+              <caret line="13" column="17" lean-forward="false" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
               <folding>
                 <element signature="e#0#57#0" expanded="true" />
+                <element signature="e#2305#3786#0" expanded="false" />
+                <marker date="1572245800427" expanded="false" signature="464:2200" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/apps/payment/urls.py">
+      <file leaf-file-name="pay_success.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/pay_success.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="44">
-              <caret line="3" column="25" lean-forward="false" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
+            <state relative-caret-position="102">
+              <caret line="57" column="38" lean-forward="false" selection-start-line="57" selection-start-column="38" selection-end-line="57" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -90,8 +99,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/templates/login.html" />
-        <option value="$PROJECT_DIR$/apps/oauth/urls.py" />
         <option value="$PROJECT_DIR$/templates/oauth_callback.html" />
         <option value="$PROJECT_DIR$/apps/oauth/utils.py" />
         <option value="$PROJECT_DIR$/celery_tasks/main.py" />
@@ -137,10 +144,12 @@
         <option value="$PROJECT_DIR$/apps/orders/urls.py" />
         <option value="$PROJECT_DIR$/static/js/place_order.js" />
         <option value="$PROJECT_DIR$/apps/orders/views.py" />
-        <option value="$PROJECT_DIR$/apps/payment/urls.py" />
         <option value="$PROJECT_DIR$/meiduo_mall/settings.py" />
-        <option value="$PROJECT_DIR$/apps/payment/views.py" />
         <option value="$PROJECT_DIR$/meiduo_mall/urls.py" />
+        <option value="$PROJECT_DIR$/apps/payment/models.py" />
+        <option value="$PROJECT_DIR$/apps/payment/urls.py" />
+        <option value="$PROJECT_DIR$/templates/pay_success.html" />
+        <option value="$PROJECT_DIR$/apps/payment/views.py" />
       </list>
     </option>
   </component>
@@ -201,7 +210,21 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="templates" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
               <option name="myItemId" value="meiduo_mall" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="meiduo_mall" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -624,11 +647,11 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1297" height="591" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17186251" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19264588" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="调试" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.48681542" sideWeight="0.49720225" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="调试" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.48681542" sideWeight="0.49720225" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30223125" sideWeight="0.5027978" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -692,16 +715,6 @@
           <line>40</line>
           <option name="timeStamp" value="86" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/apps/payment/views.py</url>
-          <line>55</line>
-          <option name="timeStamp" value="127" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/apps/payment/views.py</url>
-          <line>19</line>
-          <option name="timeStamp" value="128" />
-        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -718,21 +731,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/apps/goods/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="11" column="1" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="11" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/register.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="10" column="6" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="95" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/apps/contents/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="44">
@@ -827,6 +825,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="43">
           <caret line="80" column="8" lean-forward="false" selection-start-line="80" selection-start-column="8" selection-end-line="90" selection-end-column="14" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -841,6 +840,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
           <caret line="45" column="5" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="110" selection-end-column="7" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -859,10 +859,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/static/user_center_order.html">
+    <entry file="file://$PROJECT_DIR$/templates/user_center_order.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="146" column="57" lean-forward="false" selection-start-line="146" selection-start-column="57" selection-end-line="146" selection-end-column="57" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -893,6 +894,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="176">
           <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -916,6 +918,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="4" selection-end-column="1" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -937,6 +940,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="17" column="67" lean-forward="false" selection-start-line="17" selection-start-column="60" selection-end-line="17" selection-end-column="67" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1121,20 +1125,40 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/apps/payment/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/apps/payment/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="44">
-          <caret line="3" column="25" lean-forward="false" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
+        <state relative-caret-position="88">
+          <caret line="5" column="1" lean-forward="true" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/pay_success.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="57" column="38" lean-forward="false" selection-start-line="57" selection-start-column="38" selection-end-line="57" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/payment/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="118">
-          <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+        <state relative-caret-position="199">
+          <caret line="13" column="17" lean-forward="false" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
           <folding>
             <element signature="e#0#57#0" expanded="true" />
+            <element signature="e#2305#3786#0" expanded="false" />
+            <marker date="1572245800427" expanded="false" signature="464:2200" ph="..." />
           </folding>
         </state>
       </provider>
