@@ -1,4 +1,6 @@
+import base64
 import json
+import pickle
 import re
 
 from django.contrib.auth import login, logout
@@ -16,59 +18,51 @@ from apps.carts.utils import merge_cart_cookie_to_redis
 from apps.goods.models import SKU
 from apps.users.models import User, Address
 from apps.users.utils import generic_active_email_url, check_active_token
+from apps.verifications.constants import SMS_CODE_EXPIRES_SECONDS, SMS_FLAG_CODE_EXPIRES_SECONDS
 from utils.response_code import RETCODE
 from utils.users import logger
 
 
 class RegisterView(View):
-    """用户注册"""
-
     def get(self, request):
-        """
-        提供注册界面
-        :param request: 请求对象
-        :return: 注册界面
-        """
         return render(request, 'register.html')
 
-    # 后台功能步骤
     def post(self, request):
-        #     1.接受数据
+        # 1.接收数据
         username = request.POST.get('username')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
         mobile = request.POST.get('mobile')
-        #     2.验证数据
-        # 2.1 四个参数都有值
+        # 2.验证数据
+        # 2.1 四个参数必须都有值
         if not all([username, password, password2, mobile]):
             return HttpResponseBadRequest('参数不全')
-        # 2.2 判断用户名是否符合规则,是否重复
+        # 2.2 判断用户名是否符合规则，是否重复
         if not re.match(r'^[a-zA-Z0-9]{5,20}$', username):
-            return HttpResponseBadRequest('用户名不满足要求')
-        # 2.3 判断密码是否符合规则
-        if not re.match(r'^[0-9A-Za-z]{8,20}$', password):
+            return HttpResponseBadRequest('用户名格式不符合')
+        # 2.3 判断密码格式
+        if not re.match(r'^[a-zA-Z0-9]{8,20}$', password):
             return HttpResponseBadRequest('密码格式不正确')
-        # 2.4 判断确认密码和密码一致
-        if password2 != password:
+        # 2.4 确认密码和密码一致
+        if password != password2:
             return HttpResponseBadRequest('密码不一致')
-        # 2.5 判断手机号格式及重复
+        # 2.5 手机号格式，是否重复
         if not re.match(r'^1[3-9]\d{9}$', mobile):
-            return HttpResponseBadRequest('手机号格式错误')
+            return HttpResponseBadRequest('手机号格式不正确')
         # 3.保存数据
-        # 导入User 先输入导入
         user = User.objects.create_user(username=username,
                                         password=password,
                                         mobile=mobile)
-        '''
-           注册成功后直接登录跳转到首页
-           '''
-        # 状态保持
+
+        # #########注册成功直接登录跳转到首页###########
+        #         保持状态
         from django.contrib.auth import login
-        # user用户对象  上面接收保存数据的变量
+        # user用户对象上面接收保存数据的变量
         login(request, user)
-        return redirect(reverse('contents:index'))
+        # 注册成功后跳转首页 重定向
+        return redirect('contents:index')
         #     4.返回响应
-        return HttpResponse('注册成功')
+        # return HttpResponse('注册成功')
 
     '''
     前端获取用户名需要发送ajax数据给后端
@@ -133,7 +127,6 @@ class LoginVies(View):
 
         # 设置cookie
         response.set_cookie('username', user.username, max_age=3600 * 24 * 14)
-
 
         # #合并购物车
         response = merge_cart_cookie_to_redis(request=request, user=user, response=response)
@@ -637,3 +630,131 @@ class UserBrowseHistory(LoginRequiredMixin, View):
         # ⑤ 返回数据
         # skus在js里 this.histories = response.data.skus;
         return JsonResponse({'code': RETCODE.OK, 'errmsg': 'ok', 'skus': history_list})
+
+
+#############忘记密码#################
+class FindPwd(View):
+    def get(self, request):
+        return render(request, 'find_password.html')
+
+
+# 第一步表单提交, 获取手机号 与  发送短信的token
+class AouthView(View):
+    def get(self, request, username):
+        # 1.获取图片验证码
+        uuid = request.GET.get('image_code_id')
+        image_code = request.GET.get('text')
+        # 获取redis中的图片
+        redis_con = get_redis_connection('code')
+        image_code_id = redis_con.get('image_%s' % uuid)
+        # 判断
+        if image_code_id is None:
+            return HttpResponseBadRequest('图片验证码已过期')
+        # 数据库删除uuid
+        redis_con.delete(uuid)
+        # 比对数据
+        # 用户用小写
+        if image_code_id.decode().lower() != image_code.lower():
+            return HttpResponseBadRequest('图片验证码不一致')
+        # 判断用户
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return JsonResponse({'code': RETCODE.NODATAERR, 'errmsg': '此用户不存在'})
+        # access_token = {'mobile': user.mobile, 'user_id': user.id, }
+        access_token = base64.b64encode(pickle.dumps({'mobile': user.mobile, 'user_id': user.id})).decode()
+        return JsonResponse({'mobile': user.mobile, 'access_token': access_token})
+
+
+# 第二步 发送短信验证码
+class PwdSmsView(View):
+    def get(self, request):
+        access_token = request.GET.get('access_token')
+        user_dict = pickle.loads(base64.b64decode(access_token))
+        # 判断
+        if user_dict is None:
+            return JsonResponse({'code': RETCODE.NODATAERR, 'errmsg': '验证信息已失效'})
+        mobile = user_dict['mobile']
+        try:
+            user = User.objects.get(mobile=mobile)
+        except User.DoesNotExist:
+            return JsonResponse({'code': RETCODE.MOBILEERR, 'errmsg': '手机号错误'})
+        # 链接数据库
+        redis_con = get_redis_connection('code')
+        send_flag = redis_con.get('send_flag_%s' % mobile)
+        if send_flag:
+            return JsonResponse({'errmsg': '发送太频繁，稍后重试', 'code': RETCODE.THROTTLINGERR})
+        # 生成随机短信验证码
+        from random import randint
+        sms_code = '%06d' % randint(0, 999999)
+        print(sms_code)
+        # 保存到redis
+        # SMS_CODE_EXPIRES_SECONDS定义的变量在verifications/constants.py里，代表过期时间
+        redis_con.setex('sms_%s' % mobile, SMS_CODE_EXPIRES_SECONDS, sms_code)
+        # 添加一个标记
+        redis_con.setex('send_flag_%s' % mobile, SMS_FLAG_CODE_EXPIRES_SECONDS, 1)
+        from  celery_tasks.sms.tasks import send_sms_code
+        # 任务.delay()    # 将celery添加到中间件
+        send_sms_code.delay(mobile, sms_code)
+        # 返回json，里面是字典形式
+        return JsonResponse({'image': 'ok', 'code': RETCODE.OK})
+
+
+# 第二步 表单提交，验证手机号，获取修改密码的access_token
+class MobileCheckVIew(View):
+    def get(self, request, username):
+        # 获取短信验证码
+        sms_code = request.GET.get('sms_code')
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return JsonResponse({'code': RETCODE.USERERR, 'errmsg': '用户名错误'})
+        # 短信验证码
+        # 1.读取redis中的短信验证码
+        redis_con = get_redis_connection('code')
+        sms_code_redis = redis_con.get('sms_%s' % user.mobile)
+        # 2.判断是否过期
+        if sms_code_redis is None:
+            return HttpResponseBadRequest('手机验证码已过期')
+        # 3.删除短信验证码，不可以使用第二次
+        redis_con.delete(user.mobile)
+        redis_con.delete('sms_%s' % user.mobile)
+        # 4.判断是否正确
+        if sms_code_redis.decode() != sms_code:
+            return HttpResponseBadRequest('验证码错误')
+        # 字典转二进制字符串再编码
+        access_token = base64.b64encode(pickle.dumps({'mobile': user.mobile, 'user_id': user.id})).decode()
+        return JsonResponse({'user_id': user.id, 'access_token': access_token})
+
+
+# 第三步 修改密码
+class ChangePwd(View):
+    def post(self, request, user_id):
+        # 1.获取数据
+        json_data = json.loads(request.body.decode())
+        password = json_data.get('password')
+        password2 = json_data.get('password2')
+        access_token = json_data.get('access_token')
+        # 2.判断数据
+        if not all([password, password2, access_token]):
+            return HttpResponseBadRequest('缺少参数')
+        if password != password2:
+            return HttpResponseBadRequest('密码不一致')
+        # 3.对access_token解码转换为字典
+        user_dict = pickle.loads(base64.b64decode(access_token))
+        if user_dict is None:
+            return JsonResponse({'code': RETCODE.NODATAERR, 'errmsg': '无匹配参数'})
+            # return JsonResponse({}, status=400)
+        if int(user_id) != user_dict['user_id']:
+            return JsonResponse({'code':RETCODE. USERERR,'errmsg':'无此用户'})
+            # return JsonResponse({}, status=400)
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({'code': RETCODE.USERERR, 'errmsg': '用户id不存在'})
+            # return JsonResponse({}, status=400)
+        # 4.保存密码
+        user.set_password(password)
+        user.save()
+        return JsonResponse({'code':RETCODE.OK,'errmsg':0})
+        # return JsonResponse({})

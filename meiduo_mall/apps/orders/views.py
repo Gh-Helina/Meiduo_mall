@@ -14,13 +14,14 @@ from apps.users.models import Address
 from utils.response_code import RETCODE
 
 
+# 显示订单
 class PlaceOrderView(LoginRequiredMixin, View):
     def get(self, request):
         """
         1.这个视图必须是登陆用户才可以展示
         2.获取登陆用户的地址信息
         3.获取登陆用户redis中,选中的商品信息
-        4.根据商品信息,回去商品详细信息
+        4.根据商品信息,获取商品详细信息
         """
         # 1.这个视图必须是登陆用户才可以展示
         user = request.user
@@ -42,7 +43,7 @@ class PlaceOrderView(LoginRequiredMixin, View):
         for id in selected_ids:
             selected_dict[int(id)] = int(id_counts[id])
 
-        # 4.根据商品信息,回去商品详细信息
+        # 4.根据商品信息,获取商品详细信息
         ## selected_dict = {sku_id:count}
         ids = selected_dict.keys()
         # skus=SKU.objects.filter(id__in=ids)
@@ -51,9 +52,13 @@ class PlaceOrderView(LoginRequiredMixin, View):
         # 准备初始值
         total_count = 0
         total_amount = 0
+        # 将选中的商品拿出来
         for id in ids:
+            # 商品的id=选中的商品id
             sku = SKU.objects.get(id=id)
+            #选中的数量
             sku.count = selected_dict[id]  # 数量
+            #小计=商品价格*商品数量
             sku.amount = (sku.price * sku.count)  # 小计
             skus.append(sku)
             # 累加计算
@@ -76,6 +81,7 @@ class PlaceOrderView(LoginRequiredMixin, View):
         return render(request, 'place_order.html', context=context)
 
 
+# 订单提交
 class OrderCommitView(LoginRequiredMixin, View):
     def post(self, request):
         # 接收数据
@@ -174,9 +180,9 @@ class OrderCommitView(LoginRequiredMixin, View):
                             continue
                             # 说明修改失败
                             transaction.savepoint_rollback(savepoint)
-                            return JsonResponse({'code':RETCODE.STOCKERR,'errmsg':'下单失败'})
+                            return JsonResponse({'code': RETCODE.STOCKERR, 'errmsg': '下单失败'})
 
-                        #         2.5 将商品信息写入到订单商品信息表中
+                        # 2.5 将商品信息写入到订单商品信息表中
                         OrderGoods.objects.create(
                             order=order_info,
                             sku=sku,
@@ -206,6 +212,7 @@ class OrderCommitView(LoginRequiredMixin, View):
                              'pay_method': order_info.pay_method})
 
 
+# 提交成功
 class OrderSuccessView(View):
     def get(self, request):
         order_id = request.GET.get('order_id')
@@ -219,7 +226,6 @@ class OrderSuccessView(View):
         }
 
         return render(request, 'order_success.html', context=context)
-
 
 # 返回相应
 #

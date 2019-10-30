@@ -494,8 +494,7 @@ class CartsView(View):
 
                 return response
 
-
-
+    # 删除购物车 #
     def delete(self, request):
 
         # 1.接收数据
@@ -574,9 +573,11 @@ class CartsSelectAllView(View):
             cart = request.COOKIES.get('carts')
             response = JsonResponse({'code': RETCODE.OK, 'errmsg': '全选购物车成功'})
             if cart is not None:
+                # 解码为二进制转换为字典
                 cart = pickle.loads(base64.b64decode(cart.encode()))
                 for sku_id in cart:
                     cart[sku_id]['selected'] = selected
+                    # 字典转换为二进制进行编码
                 cookie_cart = base64.b64encode(pickle.dump(cart)).decode()
                 response.set_cookie('carts', cookie_cart, max_age=24 * 3600)
             return response
@@ -612,7 +613,7 @@ class CartsSimpleView(View):
         # 构造简单购物车JSON数据
         cart_list = []
         sku_ids = cart_dict.keys()
-        skus = SKU.objects.filter(id_in=sku_ids)
+        skus = SKU.objects.filter(id__in=sku_ids)
         for sku in skus:
             cart_list.append({
                 'id': sku.id,
@@ -622,9 +623,7 @@ class CartsSimpleView(View):
             })
         return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'cart_skus': cart_list})
 
-        # 合并购物车
 
-        # response = merge_cart_cookie_to_redis(request=request, user=user, response=response)
 
 ######################编码################################
 
